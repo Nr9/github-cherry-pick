@@ -1,12 +1,11 @@
-import * as Octokit from "@octokit/rest";
 import {
   fetchRefSha,
   RepoName,
   RepoOwner,
   Sha,
   updateRef,
-} from "shared-github-internals/lib/git";
-import { createTestContext } from "shared-github-internals/lib/tests/context";
+} from "@nr9/shared-github-internals";
+import { createTestContext } from "@nr9/shared-github-internals/lib/tests/context";
 import {
   CommandDirectory,
   createCommitFromLinesAndMessage,
@@ -19,7 +18,8 @@ import {
   getRefCommitsFromGitRepo,
   getRefShasFromGitRepo,
   RefsDetails,
-} from "shared-github-internals/lib/tests/git";
+} from "@nr9/shared-github-internals/lib/tests/git";
+import * as Octokit from "@octokit/rest";
 import { cherryPickCommits } from ".";
 
 const [initial, feature1st, feature2nd, master1st, master2nd] = [

@@ -1,29 +1,34 @@
 {
   "author": "Thibault Derousseaux <tibdex@gmail.com>",
-  "dependencies": {
-    "@octokit/rest": "^16.25.0",
-    "@types/debug": "^4.1.4",
-    "@types/node": "^11.13.8",
-    "debug": "^4.1.1",
-    "shared-github-internals": "^1.1.1"
-  },
   "description": "Cherry-pick several commits on a branch using the low level Git Data operations provided by the GitHub REST API",
+  "peerDependencies": {
+    "@octokit/rest": "^16.33.1",
+    "@types/debug": "^4.1.5",
+    "debug": "^4.1.1",
+    "@nr9/shared-github-internals": "2.0.1"
+  },
   "devDependencies": {
-    "@types/jest": "^24.0.12",
-    "jest": "^24.7.1",
-    "jest-circus": "^24.7.1",
-    "jest-junit": "^6.4.0",
-    "prettier": "^1.17.0",
-    "ts-jest": "^24.0.2",
-    "tslint": "^5.16.0",
+    "@octokit/rest": "^16.33.1",
+    "@types/debug": "^4.1.5",
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.7.12",
+    "debug": "^4.1.1",
+    "jest": "^24.9.0",
+    "jest-circus": "^24.9.0",
+    "jest-junit": "^8.0.0",
+    "prettier": "^1.18.2",
+    "@nr9/shared-github-internals": "2.0.1",
+    "ts-jest": "^24.1.0",
+    "tslint": "^5.20.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.6.4"
   },
   "engines": {
-    "node": ">= 6.11.2"
+    "node": "10"
   },
   "files": [
-    "lib/"
+    "lib/",
+    "src/"
   ],
   "keywords": [
     "git",
@@ -33,14 +38,18 @@
   ],
   "license": "MIT",
   "main": "lib",
-  "name": "github-cherry-pick",
-  "repository": "github:tibdex/github-cherry-pick",
+  "name": "@nr9/github-cherry-pick",
+  "repository": "github:Nr9/github-cherry-pick",
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
-    "prepublishOnly": "yarn build",
-    "prettier": "prettier --ignore-path .gitignore \"**/*.{js,json,md,ts,yml}\"",
+    "prepublishOnly": "npm run build",
     "test": "jest",
-    "tslint": "tslint --format stylish --project ."
+    "prettier": "prettier -c \"**/*.{js,json,md,ts,yml}\"",
+    "tslint": "tslint --format stylish --project .",
+    "lint": "npm run tslint && npm run prettier"
   },
-  "version": "1.1.0"
+  "version": "2.0.0",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
 }

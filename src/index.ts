@@ -1,5 +1,3 @@
-import * as Octokit from "@octokit/rest";
-import * as createDebug from "debug";
 import {
   CommitAuthor,
   CommitCommitter,
@@ -11,7 +9,9 @@ import {
   Sha,
   updateRef,
   withTemporaryRef,
-} from "shared-github-internals/lib/git";
+} from "@nr9/shared-github-internals";
+import * as Octokit from "@octokit/rest";
+import createDebug from "debug";
 
 const debug = createDebug("github-cherry-pick");
 
