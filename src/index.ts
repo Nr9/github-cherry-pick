@@ -42,20 +42,30 @@ const createCommit = async ({
   repo: RepoName;
   tree: Sha;
 }) => {
-  const {
-    data: { sha },
-  } = await octokit.git.createCommit({
-    author,
-    committer,
-    message,
-    owner,
-    parents: [parent],
-    repo,
-    // No PGP signature support for now.
-    // See https://developer.github.com/v3/git/commits/#create-a-commit.
-    tree,
-  });
-  return sha;
+  try {
+    const {
+      data: { sha },
+    } = await octokit.git.createCommit({
+      author,
+      committer,
+      message,
+      owner,
+      parents: [parent],
+      repo,
+      // No PGP signature support for now.
+      // See https://developer.github.com/v3/git/commits/#create-a-commit.
+      tree,
+    });
+    return sha;
+  } catch (e) {
+    console.error(
+      `cherry-pick: could not create Commit ${owner}/${repo} [${message}]`,
+      e,
+    );
+    throw new Error(
+      `cherry-pick: could not create Commit ${owner}/${repo} [${message}]`,
+    );
+  }
 };
 
 const merge = async ({
@@ -71,20 +81,28 @@ const merge = async ({
   owner: RepoOwner;
   repo: RepoName;
 }) => {
-  const {
-    data: {
-      commit: {
-        tree: { sha: tree },
+  try {
+    const {
+      data: {
+        commit: {
+          tree: { sha: tree },
+        },
       },
-    },
-  } = await octokit.repos.merge({
-    base,
-    commit_message: getCommitMessageToSkipCI(`Merge ${commit} into ${base}`),
-    head: commit,
-    owner,
-    repo,
-  });
-  return tree;
+    } = await octokit.repos.merge({
+      base,
+      commit_message: getCommitMessageToSkipCI(`Merge ${commit} into ${base}`),
+      head: commit,
+      owner,
+      repo,
+    });
+    return tree;
+  } catch (e) {
+    if (/Merge conflict/.test(e.message)) {
+      throw e;
+    }
+    console.error(`cherry-pick: could not merge ${commit} into ${base}`, e);
+    throw new Error(`cherry-pick: could not merge ${commit} into ${base}`);
+  }
 };
 
 const retrieveCommitDetails = async ({
@@ -282,43 +300,51 @@ const cherryPickCommits = async ({
   repo: RepoName;
 }): Promise<Sha> => {
   debug("starting", { commits, head, owner, repo });
-  const initialHeadSha = await fetchRefSha({
-    octokit,
-    owner,
-    ref: head,
-    repo,
-  });
-  await _intercept({ initialHeadSha });
-  return withTemporaryRef({
-    action: async temporaryRef => {
-      debug({ temporaryRef });
-      const newSha = await cherryPickCommitsOnRef({
-        commits,
-        initialHeadSha,
-        octokit,
-        owner,
-        ref: temporaryRef,
-        repo,
-      });
-      debug("updating ref with new SHA", newSha);
-      await updateRef({
-        // Make sure it's a fast-forward update.
-        force: false,
-        octokit,
-        owner,
-        ref: head,
-        repo,
-        sha: newSha,
-      });
-      debug("ref updated");
-      return newSha;
-    },
-    octokit,
-    owner,
-    ref: `cherry-pick-${head}`,
-    repo,
-    sha: initialHeadSha,
-  });
+  try {
+    const initialHeadSha = await fetchRefSha({
+      octokit,
+      owner,
+      ref: head,
+      repo,
+    });
+    await _intercept({ initialHeadSha });
+    return withTemporaryRef({
+      action: async temporaryRef => {
+        debug({ temporaryRef });
+        const newSha = await cherryPickCommitsOnRef({
+          commits,
+          initialHeadSha,
+          octokit,
+          owner,
+          ref: temporaryRef,
+          repo,
+        });
+        debug("updating ref with new SHA", newSha);
+        await updateRef({
+          // Make sure it's a fast-forward update.
+          force: false,
+          octokit,
+          owner,
+          ref: head,
+          repo,
+          sha: newSha,
+        });
+        debug("ref updated");
+        return newSha;
+      },
+      octokit,
+      owner,
+      ref: `cherry-pick-${head}`,
+      repo,
+      sha: initialHeadSha,
+    });
+  } catch (e) {
+    if (/Merge conflict/.test(e.message)) {
+      throw e;
+    }
+    console.error(`failed to cherry-pick ${owner}/${repo} [${commits}]`, e);
+    throw new Error(`failed to cherry-pick ${owner}/${repo} [${commits}]`);
+  }
 };
 
 export { cherryPickCommits };

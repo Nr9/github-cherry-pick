@@ -2,12 +2,13 @@
   "author": "Thibault Derousseaux <tibdex@gmail.com>",
   "description": "Cherry-pick several commits on a branch using the low level Git Data operations provided by the GitHub REST API",
   "peerDependencies": {
+    "@nr9/shared-github-internals": "2.0.2",
     "@octokit/rest": "^16.33.1",
     "@types/debug": "^4.1.5",
-    "debug": "^4.1.1",
-    "@nr9/shared-github-internals": "2.0.1"
+    "debug": "^4.1.1"
   },
   "devDependencies": {
+    "@nr9/shared-github-internals": "2.0.2",
     "@octokit/rest": "^16.33.1",
     "@types/debug": "^4.1.5",
     "@types/jest": "^24.0.18",
@@ -17,7 +18,6 @@
     "jest-circus": "^24.9.0",
     "jest-junit": "^8.0.0",
     "prettier": "^1.18.2",
-    "@nr9/shared-github-internals": "2.0.1",
     "ts-jest": "^24.1.0",
     "tslint": "^5.20.0",
     "tslint-config-prettier": "^1.18.0",
@@ -48,7 +48,7 @@
     "tslint": "tslint --format stylish --project .",
     "lint": "npm run tslint && npm run prettier"
   },
-  "version": "2.0.0",
+  "version": "2.0.1",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   }
